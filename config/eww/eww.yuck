@@ -1,0 +1,122 @@
+(defwidget bar []
+  (centerbox :orientation "h"
+    (workspaces)
+    (music)
+    (sidestuff)))
+
+(defwidget sidestuff []
+  (box :class "sidestuff"
+         :spacing 5
+         :orientation "h"
+         :space-evenly false
+         :halign "end"
+    (metric :label ""
+            :value volume
+            :onchange "amixer -D pulse sset Master {}%")
+    (metric :label "󰍬"
+            :value micro
+            :onchange "amixer -D pulse sset Capture {}%")
+    cputemp
+    gputemp
+    layout    
+    ""
+    date
+    ""
+    time))
+
+(defwidget workspacesOld []
+  (box :class "workspaces"
+       :orientation "h"
+       :space-evenly true
+       :halign "start"
+       :spacing 10
+    (button :onclick "wmctrl -s 0" "󰄯")
+    (button :onclick "wmctrl -s 1" "󰄰")
+    (button :onclick "wmctrl -s 2" "󰄰")
+    (button :onclick "wmctrl -s 3" "󰄰")
+    (button :onclick "wmctrl -s 4" "󰄰")))
+
+
+(defwidget workspaces []
+(box :class "workspaces"
+       :orientation "h"
+       :space-evenly true
+       :halign "start"
+       :spacing 100
+  (eventbox :onscroll "bash ~/.config/eww/scripts/change-active-workspace {} ${current_workspace}" :class "workspaces-widget"
+    (box :space-evenly true 
+         :class "workspaces"       
+      (label :text "${workspaces}${current_workspace}" :visible false)
+      (for workspace in workspaces
+        (eventbox :onclick "hyprctl dispatch workspace ${workspace.id}"
+          (box :class "workspace-entry ${workspace.id == current_workspace ? "current" : "nocurrent"} ${workspace.windows > 0 ? "occupied" : "empty"}"          
+            (label :text "${workspace.id == current_workspace ? "󰄯" : "󰄰"}")
+            )
+          )
+        )
+      )
+    ))
+  )
+  
+(defwidget music []
+  (box :class "music"
+       :orientation "h"
+       :space-evenly false
+       :halign "center"
+    {music != "" ? "🎵${music}" : ""}))
+
+
+(defwidget metric [label value onchange]
+  (box :orientation "h"
+       :class "metric"
+       :space-evenly false
+    (box :class "label" label)
+    (scale :min 0
+           :max 101
+           :active {onchange != ""}
+           :value value
+           :onchange onchange)))
+
+
+
+(deflisten workspaces :initial "[]"
+  "bash ~/.config/eww/scripts/get-workspaces")
+       
+(deflisten current_workspace :initial "1"
+  "bash ~/.config/eww/scripts/get-active-workspace")
+
+(deflisten music :initial ""
+  "playerctl --follow metadata --format '{{ artist }} - {{ title }}' || true")
+
+(defpoll volume :interval "1s"
+  "scripts/getVol")
+  
+(defpoll micro :interval "1s"
+  "scripts/getMic")
+
+(defpoll cputemp :interval "1s"
+  "scripts/cpuTemp")
+  
+(defpoll gputemp :interval "1s"
+  "scripts/gpuTemp")
+  
+(defpoll layout :interval "1s"
+  "scripts/getLayout")
+
+(defpoll date :interval "10s"
+  "date '+%d.%m.%Y'")
+  
+(defpoll time :interval "10s"
+  "date '+%H:%M'")
+
+(defwindow bar
+  :monitor 0
+  :windowtype "dock"
+  :geometry (geometry :x "0px"
+                      :y "15px"
+                      :width "1890px"
+                      :height "30px"
+                      :anchor "top center")
+  :exclusive true
+  (box :class "main-container"
+  (bar)))
