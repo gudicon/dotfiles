@@ -1,6 +1,10 @@
 # dotfiles
+
 hyprland+eww
+
 ![example](./images/example.png)
+
+Nordic theme [@EliverLara](https://github.com/EliverLara/Nordic)
 
 starship.toml by [@zaid-hussan](https://github.com/zaid-hassan/nordic-starship-toml/)
 
