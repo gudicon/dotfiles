@@ -37,7 +37,7 @@
       (for workspace in workspaces
         (eventbox :onclick "hyprctl dispatch workspace ${workspace.id}"
           (box :class "workspace-entry ${workspace.id == current_workspace ? "current" : "nocurrent"} ${workspace.windows > 0 ? "occupied" : "empty"}"          
-            (label :text "${workspace.id == current_workspace ? "󰄯" : "󰄰"}")
+            (label :text "${workspace.id == current_workspace ? "" : (workspace.windows > 0 ? "󰄯" : "󰄰")}")
             )
           )
         )
